@@ -43,6 +43,7 @@ const (
 var (
 	HeketiStorageJobContainer string
 	heketiStorageListFilename string
+	heketiStorageDurability   string
 )
 
 func init() {
@@ -55,6 +56,10 @@ func init() {
 		"image",
 		"heketi/heketi:dev",
 		"container image to run this job")
+	setupHeketiStorageCommand.Flags().StringVar(&heketiStorageDurability,
+		"durability",
+		"replicate",
+		"Durability of the database storage")
 }
 
 func saveJson(i interface{}, filename string) error {
@@ -81,7 +86,7 @@ func saveJson(i interface{}, filename string) error {
 	return nil
 }
 
-func createHeketiStorageVolume(c *client.Client) (*api.VolumeInfoResponse, error) {
+func createHeketiStorageVolume(c *client.Client, dt api.DurabilityType) (*api.VolumeInfoResponse, error) {
 
 	// Make sure the volume does not already exist on any cluster
 	clusters, err := c.ClusterList()
@@ -113,9 +118,17 @@ func createHeketiStorageVolume(c *client.Client) (*api.VolumeInfoResponse, error
 	// Create request
 	req := &api.VolumeCreateRequest{}
 	req.Size = HeketiStorageVolumeSize
-	req.Durability.Type = api.DurabilityReplicate
-	req.Durability.Replicate.Replica = 3
 	req.Name = db.HeketiStorageVolumeName
+	req.Durability.Type = dt
+
+	switch dt {
+	case api.DurabilityReplicate:
+		req.Durability.Replicate.Replica = 3
+	case api.DurabilityDistributeOnly:
+		// no further options needed
+	default:
+		return nil, fmt.Errorf("Durability %s id not supported for heketi database storage", dt)
+	}
 
 	// Create volume
 	volume, err := c.VolumeCreate(req)
@@ -267,6 +280,13 @@ var setupHeketiStorageCommand = &cobra.Command{
 		"list object is created to configure the volume.\n",
 	RunE: func(cmd *cobra.Command, args []string) (e error) {
 
+		// Validate the requested durability
+		durability := api.DurabilityType(heketiStorageDurability)
+		err := api.ValidateDurabilityType(durability)
+		if err != nil {
+			return err
+		}
+
 		// Initialize Kubernetes List object
 		list := &KubeList{}
 		list.APIVersion = "v1"
@@ -277,7 +297,7 @@ var setupHeketiStorageCommand = &cobra.Command{
 		c := client.NewClient(options.Url, options.User, options.Key)
 
 		// Create volume
-		volume, err := createHeketiStorageVolume(c)
+		volume, err := createHeketiStorageVolume(c, durability)
 		if err != nil {
 			return err
 		}

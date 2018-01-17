@@ -654,6 +654,8 @@ _heketi-cli_setup-openshift-heketi-storage()
 
     flags+=("--listfile=")
     local_nonpersistent_flags+=("--listfile=")
+    flags+=("--durability=")
+    local_nonpersistent_flags+=("--durability=")
     flags+=("--json")
     flags+=("--log-flush-frequency=")
     flags+=("--secret=")
