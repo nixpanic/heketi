@@ -44,6 +44,7 @@ var (
 	HeketiStorageJobContainer string
 	heketiStorageListFilename string
 	heketiStorageDurability   string
+	heketiStorageReplicaCount int
 )
 
 func init() {
@@ -60,6 +61,11 @@ func init() {
 		"durability",
 		"replicate",
 		"Durability of the database storage")
+	setupHeketiStorageCommand.Flags().IntVar(&heketiStorageReplicaCount,
+		"replica",
+		3,
+		"\n\tReplica value for durability type 'replicate'."+
+			"\n\tDefault is 3")
 }
 
 func saveJson(i interface{}, filename string) error {
@@ -86,7 +92,7 @@ func saveJson(i interface{}, filename string) error {
 	return nil
 }
 
-func createHeketiStorageVolume(c *client.Client, dt api.DurabilityType) (*api.VolumeInfoResponse, error) {
+func createHeketiStorageVolume(c *client.Client, dt api.DurabilityType, replicaCount int) (*api.VolumeInfoResponse, error) {
 
 	// Make sure the volume does not already exist on any cluster
 	clusters, err := c.ClusterList()
@@ -123,7 +129,7 @@ func createHeketiStorageVolume(c *client.Client, dt api.DurabilityType) (*api.Vo
 
 	switch dt {
 	case api.DurabilityReplicate:
-		req.Durability.Replicate.Replica = 3
+		req.Durability.Replicate.Replica = replicaCount
 	case api.DurabilityDistributeOnly:
 		// no further options needed
 	default:
@@ -297,7 +303,7 @@ var setupHeketiStorageCommand = &cobra.Command{
 		c := client.NewClient(options.Url, options.User, options.Key)
 
 		// Create volume
-		volume, err := createHeketiStorageVolume(c, durability)
+		volume, err := createHeketiStorageVolume(c, durability, heketiStorageReplicaCount)
 		if err != nil {
 			return err
 		}
