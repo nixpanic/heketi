@@ -29,26 +29,59 @@ $ heketi-cli snapshot list [-volume=<vol_name>]
 $ heketi-cli snapshot info -name=<snap_name>
 ```
 
-# Proposed API
+# API Proposals
+
+## Under the `/volumes` Endpoint
+
+- [x] simple interface, extension to a volume object
+- [ ] needs to duplicated/implemented for block-volumes
 
 ### Create a Snapshot
 * **Method:** _POST_  
-* **Endpoint**:`/snapshots/{volume_uuid}`
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots`
 
 ### Clone a Snapshot
 * **Method:** _POST_  
-* **Endpoint**:`/snapshots/{volume_uuid}/clone`
+* **Endpoint**:`/volumes/{volume_uuid}/clone`
 
 ### Delete a Snapshot
 * **Method:** _DELETE_  
-* **Endpoint**:`/snapshots/{volume_uuid}`
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`
 
 ### List Snapshots
 * **Method:** _GET_  
-* **Endpoint**:`/snapshots/{volume_uuid}`
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots`
 
 ### Get Snapshot Information
 * **Method:** _GET_  
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`
+
+
+## Under the `/snapshots` Endpoint
+
+- [x] simple interface, introduces a new snapshot object
+- [x] can be used transparantly for both file+block volumes
+- [ ] ugly(?) mixture of file+block volume objects
+- [ ] needs to track source (file/block) of the snapshot
+
+### Create a Snapshot
+* **Method:** _POST_
+* **Endpoint**:`/snapshots/{volume_uuid}`
+
+### Clone a Snapshot
+* **Method:** _POST_
+* **Endpoint**:`/snapshots/{volume_uuid}/clone`
+
+### Delete a Snapshot
+* **Method:** _DELETE_
+* **Endpoint**:`/snapshots/{volume_uuid}`
+
+### List Snapshots
+* **Method:** _GET_
+* **Endpoint**:`/snapshots/{volume_uuid}`
+
+### Get Snapshot Information
+* **Method:** _GET_
 * **Endpoint**:`/snapshots/{volume_uuid}/{snapshot_uuid}`
 
 
@@ -71,3 +104,6 @@ snapshot list [volname] - Snapshot List.
 snapshot restore <snapname> - Snapshot Restore.
 snapshot status [(snapname | volume <volname>)] - Snapshot Status.
 ```
+
+- [Snapshot](https://github.com/gluster/glusterfs-specs/blob/master/done/GlusterFS%203.6/Gluster%20Volume%20Snapshot.md)
+- [Cloning](https://github.com/gluster/glusterfs-specs/blob/master/done/GlusterFS%203.7/Clone%20of%20Snapshot.md)
