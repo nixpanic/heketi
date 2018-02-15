@@ -44,23 +44,104 @@ block-volumes at a later time.
 ### Create a Snapshot
 * **Method:** _POST_
 * **Endpoint**:`/volumes/{volume_uuid}/snapshots`
+* **Content-Type**: `application/json`
+* **Response HTTP Status Code**: 202, See [Asynchronous Operations](#asynchronous-operations)
+* **Temporary Resource Response HTTP Status Code**: 303, `Location` header will contain `/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`. See [Snapshot Info](#snapshot_info) for JSON response.
+* **JSON Request**:
+    * name: _string_, _optional_, Name of snapshot. If not provided, the name of the snapshot will be `snap_{id}`, for example `snap_728faa5522838746abce2980`
+    * description: _string_, _optional_, Description of the snapshot. If not provided, the description will be empty.
+    * Example:
+
+```json
+{
+    "name": "midnight",
+    "description": "nightly snapshot"
+}
+```
 
 ### Clone a Volume from a Snapshot
 * **Method:** _POST_
-* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}/clone`
+* **Content-Type**: `application/json`
+* **Response HTTP Status Code**: 202, See [Asynchronous Operations](#asynchronous-operations)
+* **Temporary Resource Response HTTP Status Code**: 303, `Location` header will contain `/volumes/{id}`. See [Volume Info](#volume_info) for JSON response.
+* **JSON Request**:
+    * name: _string_, _optional_, Name of volume. If not provided, the name of the volume will be `snap_{id}`, for example `snap_728faa5522838746abce2980`
+    * Example:
+
+```json
+{
+    "name": "new-vol-from-snap"
+}
+```
 
 ### Delete a Snapshot
 * **Method:** _DELETE_
 * **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`
+* **Response HTTP Status Code**: 202, See [Asynchronous Operations](#async)
+* **Temporary Resource Response HTTP Status Code**: 204
 
 ### List Snapshots
 * **Method:** _GET_
 * **Endpoint**:`/volumes/{volume_uuid}/snapshots`
+* **Response HTTP Status Code**: 200
+* **JSON Response**:
+    * snapshots: _array strings_, List of snapshot UUIDs.
+    * Example:
+
+```json
+{
+    "snapshots": [
+        "aa927734601288237463aa",
+        "70927734601288237463aa"
+    ]
+}
+```
 
 ### Get Snapshot Information
 * **Method:** _GET_
 * **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}`
+* **Response HTTP Status Code**: 200
+* **JSON Request**: None
+* **JSON Response**:
+    * id: _string_, Snapshot UUID
+    * name: _string_, Name of the snapshot
+    * description: _string_, Description of the snapshot
+    * created: _string_, Date when the snapshot was taken
+    * volume: _string_, UUID of the volume that this snapshot belongs to
+    * cluster: _string_, UUID of cluster which contains this snapshot
+    * Example:
 
+```json
+{
+    "id": "70927734601288237463aa",
+    "name": "midnight",
+    "description": "nightly snapshot",
+    "created": "2018-02-15 17:32:03",
+    "volume": "aa927734601288237463aa",
+    "cluster": "67e267ea403dfcdf80731165b300d1ca"
+}
+```
+
+# Future API Extensions
+
+### Clone a Volume
+* **Method:** _POST_
+* **Endpoint**:`/volumes/{volume_uuid}/clone`
+
+### Activate a Snapshot
+* **Method:** _POST_
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}/activate`
+
+### Deactivate a Snapshot
+* **Method:** _POST_
+* **Endpoint**:`/volumes/{volume_uuid}/snapshots/{snapshot_uuid}/deactivate`
+
+# Kubernetes Snapshotting Proposal
+
+[Volume
+Snapshotting](https://github.com/kubernetes-incubator/external-storage/blob/master/snapshot/doc/volume-snapshotting-proposal.md)
+in the Kubernetes external-storage provisioner.
 
 # Gluster Snapshot CLI Reference
 ```
