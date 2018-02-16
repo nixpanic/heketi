@@ -107,7 +107,7 @@ block-volumes at a later time.
     * id: _string_, Snapshot UUID
     * name: _string_, Name of the snapshot
     * description: _string_, Description of the snapshot
-    * created: _string_, Date when the snapshot was taken
+    * created: _int_, Seconds after the Epoch when the snapshot was taken
     * volume: _string_, UUID of the volume that this snapshot belongs to
     * cluster: _string_, UUID of cluster which contains this snapshot
     * Example:
@@ -117,7 +117,7 @@ block-volumes at a later time.
     "id": "70927734601288237463aa",
     "name": "midnight",
     "description": "nightly snapshot",
-    "created": "2018-02-15 17:32:03",
+    "created": "1518712323",
     "volume": "aa927734601288237463aa",
     "cluster": "67e267ea403dfcdf80731165b300d1ca"
 }
