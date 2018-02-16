@@ -1,39 +1,34 @@
-Snapshots are read-only copies of volumes that can be used for cloning new
-volumes from. Its is possible to create a snapshot through the [Snapshot Create
-API](../api/api.md#create-a-snapshot) or the commandline client.
+Snapshots are read-only copies of volumes (once the snapshot is activated) that
+can be used for cloning new volumes from. Its is possible to create a snapshot
+through the [Snapshot Create API](../api/api.md#create-a-snapshot) or the
+commandline client.
 
 From the command line client, you can type the following to create a snapshot
 from an existing volume:
 
 ```
-$ heketi-cli snapshot create -volume=<vol_name> [-name=<snap_name>]
+$ heketi-cli volume snapshot-create <vol_uuid> [-name=<snap_name>]
 ```
 
 The new snapshot can be used to create a new volume:
 
 ```
-$ heketi-cli snapshot clone -from-snap=<snap_name> [-name=<clone_name>]
+$ heketi-cli volume snapshot-clone <snap_uuid> [-name=<clone_name>]
 ```
 
 The clones of snapshots are new volumes with the same properties as the
 original. The cloned volumes can be deleted with the `heketi-cli volume delete`
 command. In a similar fashion, snapshots can be removed with the `heketi-cli
-snapshot delete` command.
+volume snapshot-delete` command.
 
 # Proposed CLI
 
-The parameters for the `heketi-cli` should be easily identifiable. Every time a
-`<vol_name>` is used, the parameter will be called `-volume=`, and the same
-counts for `<snap_name>` and `-snapshot=`. Upon creation, the name of the new
-object can be passed as `-name=`, or left out so that Heketi generates a name
-based on the UUID that will be assigned to the object.
-
 ```
-$ heketi-cli snapshot create -volume=<vol_name> [-name=<snap_name>] [-description=<string>]
-$ heketi-cli snapshot clone -snapshot=<snap_name> [-name=<vol_name>]
-$ heketi-cli snapshot delete -snapshot=<snap_name>
-$ heketi-cli snapshot list -volume=<vol_name>
-$ heketi-cli snapshot info -snapshot=<snap_name>
+$ heketi-cli volume snapshot-create <vol_uuid> [--name=<snap_uuid>] [--description=<string>]
+$ heketi-cli volume snapshot-clone <snap_uuid> [--name=<vol_uuid>]
+$ heketi-cli volume snapshot-delete <snap_uuid>
+$ heketi-cli volume snapshot-list <vol_uuid>
+$ heketi-cli volume snapshot-info <snap_uuid>
 ```
 
 # API Proposal
