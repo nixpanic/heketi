@@ -11,6 +11,9 @@ Client-side API and CLI for VolumeClone have been posted for review (PR#1111).
   - send VolumeClone changes as a PR before adding the advanced snapshot API
   - once VolumeClone is accepted, send the advanced snapshot API
 
+- some (all?) 'gluster snapshot' commands might fail, but still return success
+  - in executors/cmdexec/snapshot.go add check cliOutput.OpErr for errors
+
 - create apps/glusterfs/snapshot_entry.go
   - snapshot entry data type
   - operations
@@ -23,6 +26,11 @@ Client-side API and CLI for VolumeClone have been posted for review (PR#1111).
 
 - client needs to call to service in client/cli/go/cmds/snapshot.go
 
+- ideas for test-cases:
+  - create a clone of a clone (should work)
+  - clone wit --name=.. 2x with the same --name=.. (should fail)
+
+- list all `TODO` comments and address them
 
 ## DONE
 
