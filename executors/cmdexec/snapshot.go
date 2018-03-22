@@ -112,6 +112,9 @@ func (s *CmdExecutor) SnapshotCloneVolume(host string, vcr *executors.SnapshotCl
 		return nil, fmt.Errorf("Unable to parse output from clone snapshot %v: %v", vcr.Snapshot, err)
 	}
 	logger.Debug("%+v\n", cliOutput)
+	if cliOutput.OpRet != 0 {
+		return nil, fmt.Errorf("Failed to clone snapshot %v to volume %v: %v", vcr.Snapshot, vcr.Volume, cliOutput.OpErrStr)
+	}
 
 	// start the newly cloned volume
 	command = []string{
