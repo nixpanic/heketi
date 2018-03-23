@@ -105,9 +105,9 @@ type SnapshotCloneRequest struct {
 }
 
 type Snapshot struct {
-	XMLName     xml.Name `xml:"snapshot"`
-	Name        string   `xml:"name"`
-	UUID        string   `xml:"uuid"`
+	XMLName xml.Name `xml:"snapshot"`
+	Name    string   `xml:"name"`
+	UUID    string   `xml:"uuid"`
 }
 
 type SnapCreate struct {
@@ -116,7 +116,7 @@ type SnapCreate struct {
 }
 
 type SnapClone struct {
-	XMLName xml.Name    `xml:"CloneCreate"`
+	XMLName xml.Name `xml:"CloneCreate"`
 	Volume  VolumeClone
 }
 
@@ -132,10 +132,10 @@ type SnapDelete struct {
 }
 
 type SnapshotStatus struct {
-	XMLName     xml.Name `xml:"snapshot"`
-	Status      string   `xml:"status"`
-	Name        string   `xml:"name"`
-	UUID        string   `xml:"uuid"`
+	XMLName xml.Name `xml:"snapshot"`
+	Status  string   `xml:"status"`
+	Name    string   `xml:"name"`
+	UUID    string   `xml:"uuid"`
 }
 
 type SnapActivate struct {
