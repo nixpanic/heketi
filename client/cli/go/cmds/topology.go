@@ -32,6 +32,7 @@ var jsonConfigFile string
 // Config file
 type ConfigFileDevice struct {
 	api.Device
+	DestroyData bool `json:"destroydata,omitempty"`
 }
 type ConfigFileNode struct {
 	Devices []*ConfigFileDevice `json:"devices"`
@@ -59,13 +60,22 @@ func (device *ConfigFileDevice) UnmarshalJSON(b []byte) error {
 		device.Name = s
 		return nil
 	}
-	var d api.Device
+
+	// Using ConfigFileDevice will cause an endless loop while calling
+	// Unmarshal() on it. A copy of the struct with a different name
+	// prevents the recursive Unmarshal() call.
+	type _ConfigFileDevice struct {
+		api.Device
+		DestroyData bool `json:"destroydata,omitempty"`
+	}
+	var d _ConfigFileDevice
 	err = json.Unmarshal(b, &d)
 	if err != nil {
 		return err
 	}
 	device.Name = d.Name
 	device.Tags = d.Tags
+	device.DestroyData = d.DestroyData
 	return nil
 }
 
@@ -244,6 +254,7 @@ var topologyLoadCommand = &cobra.Command{
 						req.Name = device.Name
 						req.NodeId = nodeInfo.Id
 						req.Tags = device.Tags
+						req.DestroyData = device.DestroyData
 						err := heketi.DeviceAdd(req)
 						if err != nil {
 							fmt.Fprintf(stdout, "Unable to add device: %v\n", err)
