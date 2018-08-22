@@ -1,4 +1,8 @@
-# some global options, valid for both the builder container and the final image
+# set author and base
+# need to use fedora 27 until glide is fixed in fedora 28
+# (or we get an alternative glide)
+FROM fedora:27 as builder
+
 MAINTAINER Heketi Developers <heketi-devel@gluster.org>
 
 LABEL version="1.3.1"
@@ -9,11 +13,6 @@ ENV BUILD_HOME=/build
 ENV GOPATH=$BUILD_HOME/golang
 ENV PATH=$GOPATH/bin:$PATH
 ENV HEKETI_BRANCH="master"
-
-# set author and base
-# need to use fedora 27 until glide is fixed in fedora 28
-# (or we get an alternative glide)
-FROM fedora:27 as builder
 
 # install dependencies, build and cleanup
 RUN mkdir $BUILD_HOME $GOPATH && \
@@ -29,6 +28,17 @@ RUN mkdir $BUILD_HOME $GOPATH && \
 
 # actual container for deployment
 FROM fedora:latest
+
+MAINTAINER Heketi Developers <heketi-devel@gluster.org>
+
+LABEL version="1.3.1"
+LABEL description="Development build"
+
+# let's setup all the necessary environment variables
+ENV BUILD_HOME=/build
+ENV GOPATH=$BUILD_HOME/golang
+ENV PATH=$GOPATH/bin:$PATH
+ENV HEKETI_BRANCH="master"
 
 COPY --from=builder $GOPATH/src/github.com/heketi/heketi/heketi /usr/bin/heketi
 COPY --from=builder GOPATH/src/github.com/heketi/heketi/client/cli/go/heketi-cli /usr/bin/heketi-cli
