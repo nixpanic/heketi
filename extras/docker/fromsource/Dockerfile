@@ -41,7 +41,7 @@ ENV PATH=$GOPATH/bin:$PATH
 ENV HEKETI_BRANCH="master"
 
 COPY --from=builder $GOPATH/src/github.com/heketi/heketi/heketi /usr/bin/heketi
-COPY --from=builder GOPATH/src/github.com/heketi/heketi/client/cli/go/heketi-cli /usr/bin/heketi-cli
+COPY --from=builder $GOPATH/src/github.com/heketi/heketi/client/cli/go/heketi-cli /usr/bin/heketi-cli
 
 # post install config and volume setup
 ADD ./heketi.json /etc/heketi/heketi.json
